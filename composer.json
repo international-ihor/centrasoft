@@ -19,7 +19,8 @@
 		"vlucas/phpdotenv": "v5.*",
 		"doctrine/migrations": "v3.*",
 		"doctrine/orm": "v2.*",
-		"nikic/fast-route": "v1.*"
+		"nikic/fast-route": "v1.*",
+		"symfony/cache": "v6.*"
 	},
 	"autoload": {
 		"psr-4": {

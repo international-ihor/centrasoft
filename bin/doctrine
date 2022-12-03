@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+// bin/doctrine
+
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+
+//Loading environment variables
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . DIRECTORY_SEPARATOR . '..');
+$dotenv->safeLoad();
+
+// Adjust this path to your actual bootstrap.php
+$config = Doctrine\ORM\ORMSetup::createAttributeMetadataConfiguration(
+    paths: array(__DIR__."/src/Entities"),
+    isDevMode: $_ENV['TYPE'] == 'dev' ? true : false,
+);
+
+$conn = array(
+    'driver' => 'pdo_mysqli',
+    'dbname' => $_ENV['DB_NAME'],
+    'user' => $_ENV['DB_USER'],
+    'password' => $_ENV['DB_PASSWORD'],
+    'host' => 'localhost'
+);
+
+$entityManager = EntityManager::create($conn, $config);
+
+ConsoleRunner::run(
+    new SingleManagerProvider($entityManager)
+);

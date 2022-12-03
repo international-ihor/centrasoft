@@ -9,6 +9,24 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 
 /* 
+* Doctrine ORM
+*/
+$config = Doctrine\ORM\ORMSetup::createAttributeMetadataConfiguration(
+    paths: array(__DIR__."/src/Entities"),
+    isDevMode: $_ENV['TYPE'] == 'dev' ? true : false,
+);
+
+$conn = array(
+    'driver' => 'pdo_mysqli',
+    'dbname' => $_ENV['DB_NAME'],
+    'user' => $_ENV['DB_USER'],
+    'password' => $_ENV['DB_PASSWORD'],
+    'host' => 'localhost'
+);
+
+$entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
+
+/* 
 * Routing
 */
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
