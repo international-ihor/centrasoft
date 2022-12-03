@@ -1,7 +1,7 @@
 {
 	"name": "international-ihor/centrasoft",
 	"description": "Test work for Centrasoft",
-	"version": "v0.2",
+	"version": "v0.3",
 	"type": "package",
 	"authors": [
 		{
@@ -17,7 +17,8 @@
 		"doctrine/migrations": "v3.*",
 		"doctrine/orm": "v2.*",
 		"nikic/fast-route": "v1.*",
-		"symfony/cache": "v6.*"
+		"symfony/cache": "v6.*",
+		"johnvict/api-response": "v0.*"
 	},
 	"autoload": {
 		"psr-4": {
@@ -27,7 +28,11 @@
 	"scripts": {
 		"post-install-cmd": [
 			"php bin/prepare",
+			"php bin/doctrine orm:schema-tool:drop --force",
             "php bin/doctrine orm:schema-tool:create"
+        ],
+        "post-update-cmd": [
+        	"php bin/doctrine orm:schema-tool:update --force"
         ]
 	}
 }

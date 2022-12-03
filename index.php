@@ -32,30 +32,50 @@ $entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
 */
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 	$r->addRoute('GET', '/', function () {
-		echo 'Hello, World!';
+		include __DIR__ . DIRECTORY_SEPARATOR . "html" . DIRECTORY_SEPARATOR . 'index.html';
 	});
 
     //Users
-    $r->addRoute('GET', '/users', function ()  { echo 'Users'; });
+    $r->addRoute('GET', '/users', function ()  {
+    	
+    });
     
-    $r->addRoute('GET', '/user/{id:\d+}', function () {});
-    
-    $r->addRoute('DELETE', '/user/{id:\d+}', function () {});
-    
-    $r->addRoute('PUT', '/user/{id:\d+}', function () {});
+    /*$r->addRoute('GET', '/user/{id:\d+}', function () {
 
-    $r->addRoute('PATCH', '/user/{id:\d+}', function () {});
+    });
+    
+    $r->addRoute('DELETE', '/user/{id:\d+}', function () {
+
+    });
+    
+    $r->addRoute('PUT', '/user/{id:\d+}', function () {
+
+    });
+
+    $r->addRoute('PATCH', '/user/{id:\d+}', function () {
+
+    });
 
     //Books
-    $r->addRoute('GET', '/books', function ()  {});
-    
-    $r->addRoute('GET', '/book/{id:\d+}', function () {});
-    
-    $r->addRoute('DELETE', '/book/{id:\d+}', function () {});
-    
-    $r->addRoute('PUT', '/book/{id:\d+}', function () {});
+    $r->addRoute('GET', '/books', function ()  {
 
-    $r->addRoute('PATCH', '/book/{id:\d+}', function () {});
+    });
+    
+    $r->addRoute('GET', '/book/{id:\d+}', function () {
+
+    });
+    
+    $r->addRoute('DELETE', '/book/{id:\d+}', function () {
+
+    });
+    
+    $r->addRoute('PUT', '/book/{id:\d+}', function () {
+
+    });
+
+    $r->addRoute('PATCH', '/book/{id:\d+}', function () {
+
+    });
 
     //Genres
     $r->addRoute('GET', '/genres', function ()  {});
@@ -76,6 +96,8 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('PUT', '/journal/{id:\d+}', function () {});
 
     $r->addRoute('PATCH', '/journal/{id:\d+}', function () {});
+
+    */
 });
 
 // Fetch method and URI from somewhere
