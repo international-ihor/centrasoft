@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+// bin/prepare
+
+copy(".env.dist", ".env");
+copy(".gitignore.dist", ".gitignore");

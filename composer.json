@@ -1,7 +1,7 @@
 {
 	"name": "international-ihor/centrasoft",
 	"description": "Test work for Centrasoft",
-	"version": "v0.1",
+	"version": "v0.2",
 	"type": "package",
 	"authors": [
 		{
@@ -11,9 +11,6 @@
 			"homepage": "https://t.me/international_ihor"
 		}
 	],
-	"require-dev": {
-
-	},
 	"require": {
 		"php": ">=8",
 		"vlucas/phpdotenv": "v5.*",
@@ -26,5 +23,11 @@
 		"psr-4": {
 			"App\\": "src/"
 		}
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"php bin/prepare",
+            "php bin/doctrine orm:schema-tool:create"
+        ]
 	}
 }

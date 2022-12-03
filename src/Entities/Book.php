@@ -2,10 +2,14 @@
 
 namespace App\Entities;
 
-use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping as ORM;
 
-#[Entity]
+#[ORM\Entity]
+#[ORM\Table(name: 'book')]
 class Book
 {
-    // ...
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private int|null $id = null;
 }

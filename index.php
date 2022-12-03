@@ -1,8 +1,9 @@
 <?php
 
 //TODO: phpDocumentor
+//TODO: phpUnit
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 //Loading environment variables
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -12,12 +13,12 @@ $dotenv->safeLoad();
 * Doctrine ORM
 */
 $config = Doctrine\ORM\ORMSetup::createAttributeMetadataConfiguration(
-    paths: array(__DIR__."/src/Entities"),
+    paths: array(__DIR__ . DIRECTORY_SEPARATOR . "src/Entities"),
     isDevMode: $_ENV['TYPE'] == 'dev' ? true : false,
 );
 
 $conn = array(
-    'driver' => 'pdo_mysqli',
+    'driver' => 'pdo_mysql',
     'dbname' => $_ENV['DB_NAME'],
     'user' => $_ENV['DB_USER'],
     'password' => $_ENV['DB_PASSWORD'],
