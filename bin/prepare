@@ -2,5 +2,5 @@
 <?php
 // bin/prepare
 
-copy(".env.dist", ".env");
-copy(".gitignore.dist", ".gitignore");
+file_exists('.env') or copy(".env.dist", ".env");
+file_exists('.gitignore') or copy(".gitignore.dist", ".gitignore");

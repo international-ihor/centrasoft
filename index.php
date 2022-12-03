@@ -18,11 +18,14 @@ $config = Doctrine\ORM\ORMSetup::createAttributeMetadataConfiguration(
 );
 
 $conn = array(
-    'driver' => 'pdo_mysql',
+    'driver' => 'pdo_sqlite',
+    'path' => __DIR__ . DIRECTORY_SEPARATOR . 'db.sqlite'
+    /* 
     'dbname' => $_ENV['DB_NAME'],
     'user' => $_ENV['DB_USER'],
     'password' => $_ENV['DB_PASSWORD'],
-    'host' => 'localhost'
+    'host' => $_ENV['DB_HOST']
+    */
 );
 
 $entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
@@ -37,7 +40,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     //Users
     $r->addRoute('GET', '/users', function ()  {
-    	
     });
     
     /*$r->addRoute('GET', '/user/{id:\d+}', function () {

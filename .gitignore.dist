@@ -2,3 +2,4 @@ vendor/
 .gitignore
 .env
 composer.lock
+db.sqlite
