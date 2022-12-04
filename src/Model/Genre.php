@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entities;
+namespace App\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -11,5 +11,31 @@ class Genre
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id = null;
+    public int|null $id = null;
+
+    #[ORM\Column(name: '`name`', type: 'string')]
+    private string $name;
+
+    #[ORM\PrePersist, ORM\PreUpdate]
+    public function validate()
+    {
+        if ( empty($this->name) ) {
+            throw new ORM\ValidateException('Name is empty');
+        }
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setFirstName(string $name): void
+    {
+        $this->name = $name;
+    }
 }

@@ -6,12 +6,13 @@ use Tobscure\JsonApi\AbstractSerializer;
 
 class GenreSerializer extends AbstractSerializer
 {
-    protected $type = 'genres';
+    protected $type = 'genre';
 
     public function getAttributes($genre, array $fields = null)
     {
         return [
-            'name' => $genre->name
+            'id' => $genre->getId(),
+            'name' => $genre->getName()
         ];
     }
 }

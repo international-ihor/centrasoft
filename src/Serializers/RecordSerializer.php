@@ -6,15 +6,16 @@ use Tobscure\JsonApi\AbstractSerializer;
 
 class RecordSerializer extends AbstractSerializer
 {
-    protected $type = 'records';
+    protected $type = 'record';
 
     public function getAttributes($record, array $fields = null)
     {
         return [
-            'first_name' => $user->first_name,
-            'last_name'  => $user->last_name,
-            'address'  => $user->address,
-            'email' => $user->email
+            'id' => $record->getId(),
+            'book_id' => $record->getBookId(),
+            'user_id' => $record->getUserId(),
+            'issue_date'  => $record->getIssueDate(),
+            'return_date' => $record->getReturnDate()
         ];
     }
 }

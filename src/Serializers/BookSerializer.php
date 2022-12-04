@@ -6,13 +6,14 @@ use Tobscure\JsonApi\AbstractSerializer;
 
 class BookSerializer extends AbstractSerializer
 {
-    protected $type = 'books';
+    protected $type = 'book';
 
     public function getAttributes($book, array $fields = null)
     {
         return [
-            'author' => $book->author,
-            'title'  => $book->title
+            'id' => $book->getId(),
+            'author' => $book->getAuthor(),
+            'title'  => $book->getTitle()
         ];
     }
 }

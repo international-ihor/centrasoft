@@ -2,5 +2,16 @@
 <?php
 // bin/prepare
 
-file_exists('.env') or copy(".env.dist", ".env");
-file_exists('.gitignore') or copy(".gitignore.dist", ".gitignore");
+file_exists(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '.env') 
+	or copy(
+		__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ".env.dist"
+		, __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '.env'
+	);
+echo 'Checking .env file presence' . PHP_EOL;
+
+file_exists(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '.gitignore') 
+	or copy(
+		__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ".gitignore.dist", 
+		__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ".gitignore"
+	);
+echo 'Checking .gitignore file presence' . PHP_EOL;

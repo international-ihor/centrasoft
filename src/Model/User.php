@@ -11,19 +11,19 @@ class User
     #[ORM\Id]
     #[ORM\Column(name: '`id`', type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id = null;
+    public int|null $id = null;
 
-    #[Column(name: '`first_name`', type: 'string')]
-    private string $first_name;
+    #[ORM\Column(name: '`first_name`', type: 'string')]
+    public string|null $first_name = null;
 
-    #[Column(name: '`last_name`', type: 'string')]
-    private string $last_name;
+    #[ORM\Column(name: '`last_name`', type: 'string')]
+    public string|null $last_name = null;
 
-    #[Column(name: '`address`', type: 'string')]
-    private string $address;
+    #[ORM\Column(name: '`address`', type: 'string')]
+    public string|null $address = null;
 
-    #[Column(name: '`email`', type: 'string')]
-    private string $email;
+    #[ORM\Column(name: '`email`', type: 'string')]
+    public string|null $email = null;
 
     #[ORM\PrePersist, ORM\PreUpdate]
     public function validate()
@@ -40,12 +40,17 @@ class User
         if ( empty($this->email) ) {
             throw new ORM\ValidateException('Email is empty');
         }
-        if ( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+        if ( filter_var($this->email, FILTER_VALIDATE_EMAIL) ) {
             throw new ORM\ValidateException('Email is invalid');
         }
     }
 
-    public function getFirstName(): string
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getFirstName(): string|null
     {
         return $this->first_name;
     }
@@ -55,7 +60,7 @@ class User
         $this->first_name = $first_name;
     }
 
-    public function getLastName(): string
+    public function getLastName(): string|null
     {
         return $this->last_name;
     }
@@ -65,9 +70,9 @@ class User
         $this->last_name = $last_name;
     }
 
-    public function getAddress(): string
+    public function getAddress(): string|null
     {
-        return $this->last_name;
+        return $this->address;
     }
 
     public function setAddress(string $address): void
@@ -75,7 +80,7 @@ class User
         $this->address = $address;
     }
 
-    public function getEmail(): string
+    public function getEmail(): string|null
     {
         return $this->email;
     }

@@ -20,7 +20,7 @@ $config = Doctrine\ORM\ORMSetup::createAttributeMetadataConfiguration(
 
 $conn = array(
     'driver' => 'pdo_sqlite',
-    'path' => __DIR__ . DIRECTORY_SEPARATOR . 'db.sqlite'
+    'path' => __DIR__ . DIRECTORY_SEPARATOR . $_ENV['DB_NAME']
 );
 
 $entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
@@ -29,6 +29,7 @@ $entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
 * Routing
 */
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) use (&$entityManager) {
+
 	$r->addRoute('GET', '/', function () {
 		include __DIR__ . DIRECTORY_SEPARATOR . "html" . DIRECTORY_SEPARATOR . 'index.html';
         exit();
@@ -37,59 +38,139 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) u
     $entities = ['user', 'genre', 'book', 'record'];
 
     foreach ($entities as &$entity) {
-        $r->addRoute('GET', '/' . $entity, function () use ($entityManager, $entity) {
-            $offset = intval( $_GET['offset'] ?? 0 );
-            $limit = intval( $_GET['limit'] ?? 10 );
 
+        $entityClass = 'App\\Model\\' . ucfirst($entity);
+        $serializerClass = 'App\\Serializers\\' . ucfirst($entity) . 'Serializer';
+        
+        $r->addRoute('GET', '/' . $entity, function () use ($entityManager, $entityClass, $serializerClass) {
+            
+            //TODO: Pagination
+
+            $objects = $entityManager->getRepository($entityClass)->findAll();
+
+            $collection = new Tobscure\JsonApi\Collection($objects, new $serializerClass);
+
+            $document = new Tobscure\JsonApi\Document($collection);
+
+            $url = "http" . ( !empty($_SERVER['HTTPS'] ) ? "s":"") . "://" //protocol
+                    . $_SERVER['SERVER_NAME'] . explode('?', $_SERVER['REQUEST_URI'])[0];
+
+            $document->addMeta('total', count($objects));
+            $document->addLink('self', $url);
+
+            //TODO: Document pagination links
+
+            return json_encode($document, JSON_PRETTY_PRINT);
+        });
+
+        $r->addRoute('GET', '/' . $entity . '/{id:\d+}', function ($id) use ($entityManager, $entityClass, $serializerClass) {
             $entity = ucfirst($entity);
             $entityClass = 'App\\Model\\' . $entity;
 
-            $users = $entityManager->getRepository($entityClass)->all($offset, $limit);
+            $object = $entityManager->getRepository($entityClass)->findOneBy(['id' => $id]);
             
             $serializerClass = 'App\\Serializers\\' . $entity . 'Serializer';
-            $collection = new Tobscure\JsonApi\Collection($users, new $serializerClass);
+            $collection = new Tobscure\JsonApi\Collection([$object], new $serializerClass);
 
             $document = new Tobscure\JsonApi\Document($collection);
 
             $url = "http" . ( !empty($_SERVER['HTTPS'] ) ? "s":"") . "://" //protocol
                     . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 
-            $document->addMeta('total', count($users));
             $document->addLink('self', $url);
 
-            $document->addPaginationLinks( //Pagination links
-                $url, // The base URL for the links
-                $_GET,    // The query params provided in the request
-                $offset,    // The current offset
-                $limit,    // The current limit
-                count($users) // The total number of results
-            );
-
-            // Output the document as JSON.
             return json_encode($document, JSON_PRETTY_PRINT);
         });
+        
+        $r->addRoute('DELETE', '/' . $entity .  '/{id:\d+}', function ($id) use ($entityManager, $entityClass, $serializerClass) {
+            $entity = ucfirst($entity);
+            $entityClass = 'App\\Model\\' . $entity;
 
-        $r->addRoute('GET', '/' . $entity . '/{id:\d+}', function () {
+            $object = $entityManager->getRepository($entityClass)->findOneBy(['id' => $id]);
 
+            if ($object === null) {
+                http_response_code(404);
+                echo '404 Not Found';
+                exit;
+            }
+
+            $entityManager->remove($object);
+
+            return 'OK';
         });
         
-        $r->addRoute('DELETE', '/' . $entity .  '/{id:\d+}', function () {
+        $r->addRoute('PUT', '/' . $entity, function () use ($entityManager, $entityClass, $serializerClass) {
 
+
+            $entity = ucfirst($entity);
+            $entityClass = 'App\\Model\\' . $entity;
+
+            $object = new $entityClass();
+
+            //Setting values
+            foreach ($_GET as $param=>$value) {
+                $array = array_map('ucfirst', explode('_', $param));
+                $param = 'set' . implode('', $array);
+                $object->$param($value);
+            }
+
+            $entityManager->persist($object);
+
+            $serializerClass = 'App\\Serializers\\' . $entity . 'Serializer';
+            $collection = new Tobscure\JsonApi\Collection([$object], new $serializerClass);
+
+            $document = new Tobscure\JsonApi\Document($collection);
+
+            $url = "http" . ( !empty($_SERVER['HTTPS'] ) ? "s":"") . "://" //protocol
+                    . $_SERVER['SERVER_NAME'] . explode('?', $_SERVER['REQUEST_URI'])[0] . '/' . $object->getId();
+
+            $document->addLink('self', $url);
+
+            return json_encode($document, JSON_PRETTY_PRINT);
+            
         });
-        
-        $r->addRoute('PUT', '/' . $entity, function () {
 
-        });
+        $r->addRoute('PATCH', '/' . $entity . '/{id:\d+}', function ($id) use ($entityManager, $entityClass, $serializerClass) {
 
-        $r->addRoute('PATCH', '/' . $entity . '/{id:\d+}', function () {
+            $entityClass = 'App\\Model\\' . ucfirst($entity);
+            $object = $entityManager->getRepository($entityClass)->findOneBy(['id' => $id]);
 
+            if ($object === null) {
+                http_response_code(404);
+                echo '404 Not Found';
+                exit;
+            }
+
+            //Setting values
+            foreach ($_GET as $param=>$value) {
+                $array = array_map('ucfirst', explode('_', $param));
+                $param = 'set' . implode('', $array);
+                $object->$param($value);
+            }
+
+            $entityManager->persist($object);
+
+            $serializerClass = 'App\\Serializers\\' . $entity . 'Serializer';
+            $collection = new Tobscure\JsonApi\Collection([$object], new $serializerClass);
+
+            $document = new Tobscure\JsonApi\Document($collection);
+
+            $url = "http" . ( !empty($_SERVER['HTTPS'] ) ? "s":"") . "://" //protocol
+                    . $_SERVER['SERVER_NAME'] . explode('?', $_SERVER['REQUEST_URI'])[0] . '/' . $object->getId();
+
+            $document->addLink('self', $url);
+
+            return json_encode($document, JSON_PRETTY_PRINT);
         });
     }
 });
 
-// Fetch method and URI from somewhere
+
+/*
+* Dispatch
+*/
 $httpMethod = $_SERVER['REQUEST_METHOD'];
-$uri = $_SERVER['REQUEST_URI'];
+$uri = explode('?', $_SERVER['REQUEST_URI'])[0];
 
 $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 switch ($routeInfo[0]) {
@@ -109,3 +190,6 @@ switch ($routeInfo[0]) {
         echo $handler(...$vars);
         break;
 }
+
+//Flushing changes
+$entityManager->flush();

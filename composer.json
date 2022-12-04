@@ -1,7 +1,7 @@
 {
 	"name": "international-ihor/centrasoft",
 	"description": "Test work for Centrasoft",
-	"version": "v0.5.1",
+	"version": "v1.0",
 	"type": "package",
 	"authors": [
 		{
@@ -31,12 +31,8 @@
 		"psr-0": { "App\\Model\\": "src/Model" }
 	},
 	"scripts": {
-		"post-install-cmd": [
-			"php bin/prepare",
-			"php bin/doctrine orm:schema-tool:drop --force",
-            "php bin/doctrine orm:schema-tool:create"
-        ],
         "post-update-cmd": [
+        	"php bin/prepare",
         	"php bin/doctrine orm:schema-tool:update --force"
         ]
 	}
