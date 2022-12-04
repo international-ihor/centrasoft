@@ -4,7 +4,7 @@ namespace App\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: RecordRepository::class)]
 #[ORM\Table(name: 'record')]
 class Record
 {

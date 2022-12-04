@@ -4,7 +4,7 @@ namespace App\Model;
 
 use Doctrine\ORM\EntityRepository;
 
-class UserRepository extends EntityRepository
+class RecordRepository extends EntityRepository
 {
 	public function all(int $limit = 8, int $offset = 0) {
 		$dql = "SELECT record FROM " . Record::class . " record";
