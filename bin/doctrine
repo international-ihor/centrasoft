@@ -10,14 +10,16 @@ $dotenv->safeLoad();
 
 // Adjust this path to your actual bootstrap.php
 $config = Doctrine\ORM\ORMSetup::createAttributeMetadataConfiguration(
-    paths: array(__DIR__ . DIRECTORY_SEPARATOR . "../src/Entities"),
+    paths: array(__DIR__ . DIRECTORY_SEPARATOR . "../src/Model"),
     isDevMode: $_ENV['TYPE'] == 'dev' ? true : false
 );
+
+echo 'Database: ' . __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'db.sqlite';
 
 $conn = array(
     'driver' => 'pdo_sqlite',
     'path' => __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'db.sqlite'
-    /* 
+    /* MySQL
     'dbname' => $_ENV['DB_NAME'],
     'user' => $_ENV['DB_USER'],
     'password' => $_ENV['DB_PASSWORD'],

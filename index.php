@@ -13,19 +13,14 @@ $dotenv->safeLoad();
 * Doctrine ORM
 */
 $config = Doctrine\ORM\ORMSetup::createAttributeMetadataConfiguration(
-    paths: array(__DIR__ . DIRECTORY_SEPARATOR . "src/Entities"),
+    paths: [__DIR__ . DIRECTORY_SEPARATOR . "src/Model"],
     isDevMode: $_ENV['TYPE'] == 'dev' ? true : false,
 );
+
 
 $conn = array(
     'driver' => 'pdo_sqlite',
     'path' => __DIR__ . DIRECTORY_SEPARATOR . 'db.sqlite'
-    /* 
-    'dbname' => $_ENV['DB_NAME'],
-    'user' => $_ENV['DB_USER'],
-    'password' => $_ENV['DB_PASSWORD'],
-    'host' => $_ENV['DB_HOST']
-    */
 );
 
 $entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
@@ -33,79 +28,68 @@ $entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
 /* 
 * Routing
 */
-$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
+$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) use (&$entityManager) {
 	$r->addRoute('GET', '/', function () {
 		include __DIR__ . DIRECTORY_SEPARATOR . "html" . DIRECTORY_SEPARATOR . 'index.html';
+        exit();
 	});
 
-    //Users
-    $r->addRoute('GET', '/users', function ()  {
-    });
-    
-    /*$r->addRoute('GET', '/user/{id:\d+}', function () {
+    $entities = ['user', 'genre', 'book', 'record'];
 
-    });
-    
-    $r->addRoute('DELETE', '/user/{id:\d+}', function () {
+    foreach ($entities as &$entity) {
+        $r->addRoute('GET', '/' . $entity, function () use ($entityManager, $entity) {
+            $offset = intval( $_GET['offset'] ?? 0 );
+            $limit = intval( $_GET['limit'] ?? 10 );
 
-    });
-    
-    $r->addRoute('PUT', '/user/{id:\d+}', function () {
+            $entity = ucfirst($entity);
+            $entityClass = 'App\\Model\\' . $entity;
 
-    });
+            $users = $entityManager->getRepository($entityClass)->all($offset, $limit);
+            
+            $serializerClass = 'App\\Serializers\\' . $entity . 'Serializer';
+            $collection = new Tobscure\JsonApi\Collection($users, new $serializerClass);
 
-    $r->addRoute('PATCH', '/user/{id:\d+}', function () {
+            $document = new Tobscure\JsonApi\Document($collection);
 
-    });
+            $url = "http" . ( !empty($_SERVER['HTTPS'] ) ? "s":"") . "://" //protocol
+                    . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 
-    //Books
-    $r->addRoute('GET', '/books', function ()  {
+            $document->addMeta('total', count($users));
+            $document->addLink('self', $url);
 
-    });
-    
-    $r->addRoute('GET', '/book/{id:\d+}', function () {
+            $document->addPaginationLinks( //Pagination links
+                $url, // The base URL for the links
+                $_GET,    // The query params provided in the request
+                $offset,    // The current offset
+                $limit,    // The current limit
+                count($users) // The total number of results
+            );
 
-    });
-    
-    $r->addRoute('DELETE', '/book/{id:\d+}', function () {
+            // Output the document as JSON.
+            return json_encode($document, JSON_PRETTY_PRINT);
+        });
 
-    });
-    
-    $r->addRoute('PUT', '/book/{id:\d+}', function () {
+        $r->addRoute('GET', '/' . $entity . '/{id:\d+}', function () {
 
-    });
+        });
+        
+        $r->addRoute('DELETE', '/' . $entity .  '/{id:\d+}', function () {
 
-    $r->addRoute('PATCH', '/book/{id:\d+}', function () {
+        });
+        
+        $r->addRoute('PUT', '/' . $entity, function () {
 
-    });
+        });
 
-    //Genres
-    $r->addRoute('GET', '/genres', function ()  {});
-    
-    $r->addRoute('GET', '/genre/{id:\d+}', function () {});
-    
-    $r->addRoute('DELETE', '/genre/{id:\d+}', function () {});
-    
-    $r->addRoute('PUT', '/genre/{id:\d+}', function () {});
+        $r->addRoute('PATCH', '/' . $entity . '/{id:\d+}', function () {
 
-    $r->addRoute('PATCH', '/genre/{id:\d+}', function () {});
-
-    //Journal
-    $r->addRoute('GET', '/journal', function ()  {});
-
-    //$r->addRoute('GET', '/journal/{id:\d+}', function ()  {});
-    
-    $r->addRoute('PUT', '/journal/{id:\d+}', function () {});
-
-    $r->addRoute('PATCH', '/journal/{id:\d+}', function () {});
-
-    */
+        });
+    }
 });
 
 // Fetch method and URI from somewhere
 $httpMethod = $_SERVER['REQUEST_METHOD'];
 $uri = $_SERVER['REQUEST_URI'];
-
 
 $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 switch ($routeInfo[0]) {
@@ -119,8 +103,9 @@ switch ($routeInfo[0]) {
         echo '405 Method Not Allowed';
         break;
     case FastRoute\Dispatcher::FOUND:
+        header('Content-Type: application/json');
         $handler = $routeInfo[1];
         $vars = $routeInfo[2];
-        $handler(...$vars);
+        echo $handler(...$vars);
         break;
 }

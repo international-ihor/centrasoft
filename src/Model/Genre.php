@@ -5,7 +5,7 @@ namespace App\Entities;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'book')]
+#[ORM\Table(name: 'genre')]
 class Genre
 {
     #[ORM\Id]
