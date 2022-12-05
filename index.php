@@ -31,8 +31,9 @@ $entityManager = Doctrine\ORM\EntityManager::create($conn, $config);
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) use (&$entityManager) {
 
 	$r->addRoute('GET', '/', function () {
+        header('Content-Type: text/html');
 		include __DIR__ . DIRECTORY_SEPARATOR . "html" . DIRECTORY_SEPARATOR . 'index.html';
-        exit();
+        exit;
 	});
 
     $entities = ['user', 'genre', 'book', 'record'];
