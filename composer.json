@@ -1,8 +1,8 @@
 {
 	"name": "international-ihor/centrasoft",
 	"description": "Test work for Centrasoft",
-	"version": "v1.1.1",
-	"type": "package",
+	"version": "v1.1.2",
+	"type": "project",
 	"authors": [
 		{
 			"name": "Ihor Budko",
