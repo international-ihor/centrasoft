@@ -33,8 +33,14 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) u
 	$r->addRoute('GET', '/', function () {
         header('Content-Type: text/html');
 		include __DIR__ . DIRECTORY_SEPARATOR . "html" . DIRECTORY_SEPARATOR . 'index.html';
-        exit;
+        exit();
 	});
+
+    $r->addRoute('GET', '/app.js', function () {
+        header('Content-Type: text/javascript');
+        include __DIR__ . DIRECTORY_SEPARATOR . "html" . DIRECTORY_SEPARATOR . 'app.js';
+        exit();
+    });
 
     $entities = ['user', 'genre', 'book', 'record'];
 
@@ -84,8 +90,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) u
         });
         
         $r->addRoute('DELETE', '/' . $entity .  '/{id:\d+}', function ($id) use ($entityManager, $entityClass, $serializerClass) {
-            $entity = ucfirst($entity);
-            $entityClass = 'App\\Model\\' . $entity;
 
             $object = $entityManager->getRepository($entityClass)->findOneBy(['id' => $id]);
 
@@ -102,10 +106,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) u
         
         $r->addRoute('PUT', '/' . $entity, function () use ($entityManager, $entityClass, $serializerClass) {
 
-
-            $entity = ucfirst($entity);
-            $entityClass = 'App\\Model\\' . $entity;
-
             $object = new $entityClass();
 
             //Setting values
@@ -116,8 +116,8 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) u
             }
 
             $entityManager->persist($object);
+            $entityManager->flush();
 
-            $serializerClass = 'App\\Serializers\\' . $entity . 'Serializer';
             $collection = new Tobscure\JsonApi\Collection([$object], new $serializerClass);
 
             $document = new Tobscure\JsonApi\Document($collection);
@@ -133,7 +133,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) u
 
         $r->addRoute('PATCH', '/' . $entity . '/{id:\d+}', function ($id) use ($entityManager, $entityClass, $serializerClass) {
 
-            $entityClass = 'App\\Model\\' . ucfirst($entity);
             $object = $entityManager->getRepository($entityClass)->findOneBy(['id' => $id]);
 
             if ($object === null) {
@@ -151,7 +150,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) u
 
             $entityManager->persist($object);
 
-            $serializerClass = 'App\\Serializers\\' . $entity . 'Serializer';
             $collection = new Tobscure\JsonApi\Collection([$object], new $serializerClass);
 
             $document = new Tobscure\JsonApi\Document($collection);
